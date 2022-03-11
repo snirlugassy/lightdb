@@ -20,7 +20,7 @@ func handleError(err error) {
 }
 
 func main() {
-	collection := object_db.Collection{
+	collection := lightdb.Collection{
 		FilePath: "example.db",
 		DType:    reflect.TypeOf(Person{}),
 	}

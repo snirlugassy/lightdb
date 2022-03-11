@@ -4,7 +4,7 @@ Lightweight object database written in Go
 ## Insert Example
 ```go
 import (
-    "object_db"
+    "lightdb"
     ...
 )
 
