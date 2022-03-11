@@ -14,6 +14,7 @@ type CollectionCore struct {
 
 type Collection struct {
 	CollectionCore
+	Name     string
 	FilePath string
 	DType    reflect.Type
 }
