@@ -124,3 +124,16 @@ func TestCollection_Find(t *testing.T) {
 		t.Fatal("wrong results array size")
 	}
 }
+
+func TestCollection_Update(t *testing.T) {
+	db := lightdb.Collection{FilePath: "test_collection_find.db", DType: reflect.TypeOf(A{})}
+	i, insertError := db.Insert(A{Name: "a", Age: 1})
+	if insertError != nil {
+		t.Fatal(insertError)
+	}
+	db.Update(i, A{Name: "b", Age: 2})
+	updated := db.Get(i).(A)
+	if updated.Name != "b" || updated.Age != 2 {
+		t.Fatal("failed to update")
+	}
+}
