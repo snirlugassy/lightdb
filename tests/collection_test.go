@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"object_db"
+	lightdb "object_db"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -14,7 +14,7 @@ type A struct {
 }
 
 type B struct {
-	Name string
+	Title string
 }
 
 func TestCollection_Insert(t *testing.T) {
@@ -84,7 +84,7 @@ func TestCollection_StrictType(t *testing.T) {
 		t.Fatal("Error inserting A")
 	}
 
-	b := B{Name: "hello"}
+	b := B{Title: "hello"}
 	_, errB := db.Insert(b)
 	if errB == nil {
 		t.Fatal(errB)
