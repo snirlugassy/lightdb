@@ -17,7 +17,7 @@ type Person struct {
 ...
 
 func main() {
-    collection := object_db.Collection{
+    collection := lightdb.Collection{
         FilePath: "example.db",
         DType:    reflect.TypeOf(Person{}),
     }
@@ -44,7 +44,7 @@ if commitError != nil {
 ### Pull changes from disk
 ```go
 func main() {
-    collection := object_db.Collection{
+    collection := lightdb.Collection{
         FilePath: "example.db",
         DType:    reflect.TypeOf(Person{}),
     }
