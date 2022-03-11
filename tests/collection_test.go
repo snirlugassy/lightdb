@@ -76,7 +76,7 @@ func TestCollection_Pull(t *testing.T) {
 }
 
 func TestCollection_StrictType(t *testing.T) {
-	db := lightdb.Collection{FilePath: "test_strict_type.db"}
+	db := lightdb.Collection{FilePath: "test_strict_type.db", DType: reflect.TypeOf(A{})}
 	obj := A{Age: 1}
 	_, errA := db.Insert(obj)
 	if errA != nil {
@@ -88,5 +88,39 @@ func TestCollection_StrictType(t *testing.T) {
 	_, errB := db.Insert(b)
 	if errB == nil {
 		t.Fatal(errB)
+	}
+}
+
+func TestCollection_Find(t *testing.T) {
+	db := lightdb.Collection{FilePath: "test_collection_find.db", DType: reflect.TypeOf(A{})}
+	db.Insert(A{Name: "a", Age: 1})
+	db.Insert(A{Name: "b", Age: 2})
+	db.Insert(A{Name: "b", Age: 3})
+	db.Insert(A{Name: "c", Age: 4})
+	db.Insert(A{Name: "d", Age: 4})
+	db.Insert(A{Name: "d", Age: 5})
+
+	searchFields := make(map[string]interface{})
+	searchFields["Name"] = "b"
+	searchFields["Age"] = "20"
+	searchFields["Banana"] = 1
+
+	results := make([]interface{}, 0)
+	db.Find(searchFields, &results)
+	t.Log(results)
+
+	if len(results) != 2 {
+		t.Fatal("wrong results array size")
+	}
+
+	searchFields["Name"] = nil
+	searchFields["Age"] = 4
+
+	results = make([]interface{}, 0)
+	db.Find(searchFields, &results)
+	t.Log(results)
+
+	if len(results) != 2 {
+		t.Fatal("wrong results array size")
 	}
 }
