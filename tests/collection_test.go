@@ -46,13 +46,6 @@ func TestCollection_Commit(t *testing.T) {
 	if commitError != nil {
 		t.Fatal(commitError)
 	}
-
-	//if _, err := os.Stat(db_file_path); err == nil {
-	//	err := os.Remove(db_file_path)
-	//	if err != nil {
-	//		t.Fatal(err)
-	//	}
-	//}
 }
 
 func TestCollection_Pull(t *testing.T) {
