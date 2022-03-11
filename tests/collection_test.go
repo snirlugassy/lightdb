@@ -19,7 +19,7 @@ type B struct {
 
 func TestCollection_Insert(t *testing.T) {
 	db_file_path := filepath.Join(os.TempDir(), "test_insert.db")
-	db := object_db.Collection{FilePath: db_file_path, DType: reflect.TypeOf(A{})}
+	db := lightdb.Collection{FilePath: db_file_path, DType: reflect.TypeOf(A{})}
 	obj := A{Age: 1}
 	i, err := db.Insert(&obj)
 	if err != nil {
@@ -36,7 +36,7 @@ func TestCollection_Insert(t *testing.T) {
 
 func TestCollection_Commit(t *testing.T) {
 	db_file_path := filepath.Join(os.TempDir(), "test_commit.db")
-	db := object_db.Collection{FilePath: db_file_path, DType: reflect.TypeOf(A{})}
+	db := lightdb.Collection{FilePath: db_file_path, DType: reflect.TypeOf(A{})}
 	obj := A{Age: 1}
 	_, err := db.Insert(obj)
 	if err != nil {
@@ -50,7 +50,7 @@ func TestCollection_Commit(t *testing.T) {
 
 func TestCollection_Pull(t *testing.T) {
 	db_file_path := filepath.Join(os.TempDir(), "test_pull.db")
-	db := object_db.Collection{FilePath: db_file_path, DType: reflect.TypeOf(A{})}
+	db := lightdb.Collection{FilePath: db_file_path, DType: reflect.TypeOf(A{})}
 	obj := &A{Age: 1}
 	i, err := db.Insert(obj)
 	if err != nil {
@@ -61,7 +61,7 @@ func TestCollection_Pull(t *testing.T) {
 		t.Fatal(commitErr)
 	}
 
-	db2 := object_db.Collection{FilePath: db_file_path, DType: reflect.TypeOf(A{})}
+	db2 := lightdb.Collection{FilePath: db_file_path, DType: reflect.TypeOf(A{})}
 	pullError := db2.Pull()
 	if pullError != nil {
 		t.Fatal(pullError)
@@ -76,7 +76,7 @@ func TestCollection_Pull(t *testing.T) {
 }
 
 func TestCollection_StrictType(t *testing.T) {
-	db := object_db.Collection{FilePath: "test_strict_type.db"}
+	db := lightdb.Collection{FilePath: "test_strict_type.db"}
 	obj := A{Age: 1}
 	_, errA := db.Insert(obj)
 	if errA != nil {

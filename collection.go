@@ -1,4 +1,4 @@
-package object_db
+package lightdb
 
 import (
 	"encoding/gob"
