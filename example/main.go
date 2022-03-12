@@ -1,9 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"object_db"
+	lightdb "object_db"
 	"reflect"
 )
 
@@ -13,32 +12,28 @@ type Person struct {
 	Title string
 }
 
-func handleError(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
 func main() {
-	collection := lightdb.Collection{
-		FilePath: "example.db",
-		DType:    reflect.TypeOf(Person{}),
+	db := lightdb.Database{
+		Name: "example-db",
+		Path: "/tmp/db",
 	}
 
-	john, err := collection.Insert(Person{
-		Age:  20,
-		Name: "John",
-	})
-	handleError(err)
+	collection := db.CreateCollection("person", reflect.TypeOf(Person{}))
 
-	david, err := collection.Insert(Person{
-		Age:  30,
-		Name: "David",
-	})
-	handleError(err)
+	john, err := collection.Insert(Person{Age: 20, Name: "John"})
+	if err != nil {
+		log.Fatal("error inserting john to collection")
+	}
+
+	collection.Insert(Person{Age: 30, Name: "David"})
 
 	j := collection.Get(john).(Person)
-	fmt.Println(j)
+	log.Println(j)
 
-	fmt.Println(collection.Get(david))
+	personSearch := make(map[string]interface{})
+	personSearch["Name"] = "David"
+
+	results := make([]interface{}, 0)
+	collection.Find(personSearch, &results)
+	log.Println(results)
 }
