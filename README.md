@@ -14,23 +14,32 @@ type Person struct {
     Title string
 }
 
-...
-
-func main() {
-    collection := lightdb.Collection{
-        FilePath: "example.db",
-        DType:    reflect.TypeOf(Person{}),
-    }
-    
-    john, err := collection.Insert(Person{
-        Age:  20,
-        Name: "John",
-    })
-    handleError(err)
-    
-    j := collection.Get(john).(Person)
-    log.Println(j)
+db := lightdb.Database{
+    Name: "example-db",
+    Path: "/tmp/db",
 }
+
+collection := db.CreateCollection("person", reflect.TypeOf(Person{}))
+
+john, err := collection.Insert(Person{Age: 20, Name: "John"})
+if err != nil {
+    log.Fatal("error inserting john to collection")
+}
+
+collection.Insert(Person{Age: 30, Name: "David"})
+
+_john := collection.Get(john).(Person)
+
+```
+
+### Find object in collection using fields map
+```go
+personSearch := make(map[string]interface{})
+personSearch["Name"] = "David"
+
+results := make([]interface{}, 0)
+collection.Find(personSearch, &results)
+
 ```
 
 ### Commit changes to disk
