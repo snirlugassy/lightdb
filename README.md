@@ -53,14 +53,14 @@ if commitError != nil {
 ### Pull changes from disk
 ```go
 collection := lightdb.Collection{
-	FilePath: "example.db",
-	DType:    reflect.TypeOf(Person{}),
+    FilePath: "example.db",
+    DType:    reflect.TypeOf(Person{}),
 }
 
 pullError := collection.Pull()
 if pullError != nil {
-	log.Fatal("Error pulling db from disk")
+    log.Fatal("Error pulling db from disk")
 } else {
-	log.Println("pulled db from disk, db is up-to-date!")	
+    log.Println("pulled db from disk, db is up-to-date!")	
 } 
 ```
