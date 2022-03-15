@@ -57,17 +57,17 @@ func (collection *Collection) Update(id int, object interface{}) error {
 
 func (collection *Collection) Commit() error {
 	gob.RegisterName(reflect.New(collection.DType).String(), reflect.New(collection.DType).Interface())
-	indexError := writeGob(collection.FilePath+".core", collection.CollectionCore)
-	if indexError != nil {
-		return indexError
+	err := writeObject(collection.FilePath+".core", collection.CollectionCore)
+	if err != nil {
+		return err
 	}
 	return nil
 }
 
 func (collection *Collection) Pull() error {
-	indexError := readGob(collection.FilePath+".core", &collection.CollectionCore)
-	if indexError != nil {
-		return indexError
+	err := readObject(collection.FilePath+".core", &collection.CollectionCore)
+	if err != nil {
+		return err
 	}
 	return nil
 }
