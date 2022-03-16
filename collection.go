@@ -7,7 +7,7 @@ import (
 )
 
 type CollectionCore struct {
-	Index map[int]*interface{}
+	Index map[int]interface{}
 	Seq   int
 }
 
@@ -19,10 +19,10 @@ type Collection struct {
 }
 
 type CollectionInterface interface {
-	Insert(object *interface{}) (int, error)
+	Insert(object interface{}) (int, error)
 	Get(id int) interface{}
 	Delete(id int)
-	Update(id int, object *interface{}) error
+	Update(id int, object interface{}) error
 	Commit() error
 	Pull() error
 	Find(query map[string]interface{}, results *[]interface{}) error
@@ -30,17 +30,25 @@ type CollectionInterface interface {
 
 func (collection *Collection) Insert(object interface{}) (int, error) {
 	if collection.Index == nil {
-		collection.Index = make(map[int]*interface{})
+		collection.Index = make(map[int]interface{})
 	} else if reflect.TypeOf(object) != collection.DType {
 		return -1, errors.New("invalid data type for insert")
 	}
 	collection.Seq++
-	collection.Index[collection.Seq] = &object
+	//data, err := json.Marshal(object)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	collection.Index[collection.Seq] = object
 	return collection.Seq, nil
 }
 
 func (collection *Collection) Get(id int) interface{} {
-	return *collection.CollectionCore.Index[id]
+	//data, found := collection.CollectionCore.Index[id]
+	//if found {
+	//	return json.Unmarshal(data, target)
+	//}
+	return collection.CollectionCore.Index[id]
 }
 
 func (collection *Collection) Delete(id int) {
@@ -51,12 +59,13 @@ func (collection *Collection) Update(id int, object interface{}) error {
 	if reflect.TypeOf(object) != collection.DType {
 		return errors.New("invalid type of object to update")
 	}
-	collection.Index[id] = &object
+	collection.Index[id] = object
 	return nil
 }
 
 func (collection *Collection) Commit() error {
-	gob.RegisterName(reflect.New(collection.DType).String(), reflect.New(collection.DType).Interface())
+	//gob.RegisterName(reflect.New(collection.DType).String(), reflect.New(collection.DType).Elem().Interface())
+	gob.Register(reflect.New(collection.DType).Elem().Interface())
 	err := writeObject(collection.FilePath+".core", collection.CollectionCore)
 	if err != nil {
 		return err
@@ -65,6 +74,7 @@ func (collection *Collection) Commit() error {
 }
 
 func (collection *Collection) Pull() error {
+	//gob.RegisterName(reflect.New(collection.DType).String(), reflect.New(collection.DType).Elem().Interface())
 	err := readObject(collection.FilePath+".core", &collection.CollectionCore)
 	if err != nil {
 		return err
@@ -84,13 +94,13 @@ func (collection *Collection) Find(query map[string]interface{}, results *[]inte
 	for _, item := range collection.Index {
 		matchFlag := true
 		for k, v := range validFields {
-			if reflect.ValueOf(*item).FieldByName(k).Interface() != v {
+			if reflect.ValueOf(item).FieldByName(k).Interface() != v {
 				matchFlag = false
 				break
 			}
 		}
 		if matchFlag {
-			*results = append(*results, *item)
+			*results = append(*results, item)
 		}
 	}
 

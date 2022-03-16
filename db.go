@@ -8,13 +8,13 @@ import (
 )
 
 type Database struct {
-	Collections []Collection
+	Collections []*Collection
 	Name        string
 	Path        string
 }
 
 func (db *Database) Init() error {
-	db.Collections = make([]Collection, 0)
+	db.Collections = make([]*Collection, 0)
 	dbPath, err := os.Open(db.Path)
 	if err != nil {
 		return err
@@ -32,23 +32,34 @@ func (db *Database) Init() error {
 	return nil
 }
 
-func (db *Database) CreateCollection(name string, dtype reflect.Type) Collection {
+func (db *Database) CreateCollection(name string, dtype reflect.Type) *Collection {
 	collection := Collection{
 		Name:     name,
 		DType:    dtype,
 		FilePath: filepath.Join(db.Path, name+".db"),
 	}
-	db.Collections = append(db.Collections, collection)
-	return collection
+	db.Collections = append(db.Collections, &collection)
+	return &collection
 }
 
-func (db *Database) GetCollection(name string) (Collection, bool) {
+func (db *Database) LoadCollection(name string, dtype reflect.Type) (*Collection, error) {
+	collection := Collection{
+		Name:     name,
+		DType:    dtype,
+		FilePath: filepath.Join(db.Path, name+".db"),
+	}
+	pullError := collection.Pull()
+	db.Collections = append(db.Collections, &collection)
+	return &collection, pullError
+}
+
+func (db *Database) GetCollection(name string) (*Collection, bool) {
 	for i := 0; i < len(db.Collections); i++ {
 		if db.Collections[i].Name == name {
 			return db.Collections[i], true
 		}
 	}
-	return Collection{}, false
+	return &Collection{}, false
 }
 
 func (db *Database) Commit() error {

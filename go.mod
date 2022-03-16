@@ -1,3 +1,3 @@
-module object_db
+module lightdb
 
 go 1.17
