@@ -20,6 +20,7 @@ type Collection struct {
 
 type CollectionInterface interface {
 	Insert(object interface{}) (int, error)
+	InsertArray(objects []interface{}) ([]int, error)
 	Get(id int) interface{}
 	Delete(id int)
 	Update(id int, object interface{}) error
@@ -35,19 +36,23 @@ func (collection *Collection) Insert(object interface{}) (int, error) {
 		return -1, errors.New("invalid data type for insert")
 	}
 	collection.Seq++
-	//data, err := json.Marshal(object)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
 	collection.Index[collection.Seq] = object
 	return collection.Seq, nil
 }
 
+func (collection *Collection) InsertArray(objects []interface{}) ([]int, error) {
+	ids := make([]int, 0)
+	for i := 0; i < len(objects); i++ {
+		id, err := collection.Insert(objects[i])
+		if err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+	return ids, nil
+}
+
 func (collection *Collection) Get(id int) interface{} {
-	//data, found := collection.CollectionCore.Index[id]
-	//if found {
-	//	return json.Unmarshal(data, target)
-	//}
 	return collection.CollectionCore.Index[id]
 }
 
@@ -64,7 +69,6 @@ func (collection *Collection) Update(id int, object interface{}) error {
 }
 
 func (collection *Collection) Commit() error {
-	//gob.RegisterName(reflect.New(collection.DType).String(), reflect.New(collection.DType).Elem().Interface())
 	gob.Register(reflect.New(collection.DType).Elem().Interface())
 	err := writeObject(collection.FilePath+".core", collection.CollectionCore)
 	if err != nil {
@@ -74,7 +78,7 @@ func (collection *Collection) Commit() error {
 }
 
 func (collection *Collection) Pull() error {
-	//gob.RegisterName(reflect.New(collection.DType).String(), reflect.New(collection.DType).Elem().Interface())
+	gob.Register(reflect.New(collection.DType).Elem().Interface())
 	err := readObject(collection.FilePath+".core", &collection.CollectionCore)
 	if err != nil {
 		return err
