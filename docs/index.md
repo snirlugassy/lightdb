@@ -1,37 +1,74 @@
-## Welcome to GitHub Pages
+# LightDB
+Lightweight object database written in Go
 
-You can use the [editor on GitHub](https://github.com/snirlugassy/lightdb/edit/main/docs/index.md) to maintain and preview the content for your website in Markdown files.
-
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
-
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+### Initialize DB instance
+```go
+db := lightdb.Database{
+    Name: "example-db",
+    Path: "/tmp/db",
+}
 ```
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+### Create collection
+```go
+collection := db.CreateCollection("users", reflect.TypeOf(User{}))
+```
 
-### Jekyll Themes
+### Insert objects
+```go
+john, err := collection.Insert(User{ID: 1, Name: "John"})
+if err != nil {
+    log.Fatal("error inserting john to collection")
+} else {
+    log.Println("John's ID", john)
+}
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/snirlugassy/lightdb/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+collection.Insert(User{ID: 2, Name: "David", IsAdmin: true})
+collection.Insert(User{ID: 3, Name: "Alfred", IsAdmin: false})
+```
 
-### Support or Contact
+### Retrieve objects
+```go
+user1, found := collection.Get(1).(User)
+if !found {
+    log.Fatal("John not found")
+}
+```
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+### Search objects
+```go
+personSearch := make(map[string]interface{})
+personSearch["Name"] = "David"
+
+results := make([]interface{}, 0)
+collection.Find(personSearch, &results)
+```
+
+### Update objects
+```go
+log.Println("Setting John as admin")
+user1.IsAdmin = true
+
+log.Println("Updating collection")
+collection.Update(user1.ID, user1)
+```
+
+### Commit changes (Save to disk)
+```go
+db.Commit()
+```
+
+### Create another DB instance
+```go
+db2 := lightdb.Database{
+    Name: "example-db",
+    Path: "/tmp/db",
+}
+
+collection2, err := db2.LoadCollection("users", reflect.TypeOf(User{}))
+if err != nil {
+    log.Fatal(err)
+}
+collection2.Pull()
+_user1, found := collection2.Get(1).(User)
+```
