@@ -1,7 +1,7 @@
 package tests
 
 import (
-	lightdb "object_db"
+	"lightdb"
 	"reflect"
 	"testing"
 )

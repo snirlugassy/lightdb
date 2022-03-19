@@ -1,7 +1,7 @@
 package tests
 
 import (
-	lightdb "object_db"
+	"lightdb"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -21,15 +21,19 @@ func TestCollection_Insert(t *testing.T) {
 	db_file_path := filepath.Join(os.TempDir(), "test_insert.db")
 	db := lightdb.Collection{FilePath: db_file_path, DType: reflect.TypeOf(A{})}
 	obj := A{Age: 1}
-	i, err := db.Insert(&obj)
+	i, err := db.Insert(obj)
 	if err != nil {
 		t.Log(err)
 		t.Fatal("Error inserting A")
 	}
 
-	_obj := db.Get(i).(*A)
+	_obj, found := db.Get(i).(A)
+	if !found {
+		t.Fatal("_obj not found")
+	}
+
 	t.Log(_obj.Age)
-	if !reflect.DeepEqual(obj, *_obj) {
+	if !reflect.DeepEqual(obj, _obj) {
 		t.Fatal("restored object different from inserted object")
 	}
 }
@@ -51,7 +55,7 @@ func TestCollection_Commit(t *testing.T) {
 func TestCollection_Pull(t *testing.T) {
 	db_file_path := filepath.Join(os.TempDir(), "test_pull.db")
 	db := lightdb.Collection{FilePath: db_file_path, DType: reflect.TypeOf(A{})}
-	obj := &A{Age: 1}
+	obj := A{Age: 1}
 	i, err := db.Insert(obj)
 	if err != nil {
 		t.Fatal(err)
@@ -66,9 +70,9 @@ func TestCollection_Pull(t *testing.T) {
 	if pullError != nil {
 		t.Fatal(pullError)
 	}
-	obj2 := db2.Get(i).(*A)
+	obj2 := db2.Get(i).(A)
 
-	if *obj != *obj2 {
+	if !reflect.DeepEqual(obj, obj2) {
 		t.Log(obj)
 		t.Log(obj2)
 		t.Fatal("Failed to commit, pull and restore object")
@@ -132,8 +136,8 @@ func TestCollection_Update(t *testing.T) {
 		t.Fatal(insertError)
 	}
 	db.Update(i, A{Name: "b", Age: 2})
-	updated := db.Get(i).(A)
-	if updated.Name != "b" || updated.Age != 2 {
+	updated, found := db.Get(i).(A)
+	if !found || updated.Name != "b" || updated.Age != 2 {
 		t.Fatal("failed to update")
 	}
 }
