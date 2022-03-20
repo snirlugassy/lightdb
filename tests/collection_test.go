@@ -129,6 +129,29 @@ func TestCollection_Find(t *testing.T) {
 	}
 }
 
+func TestCollection_First(t *testing.T) {
+	db := lightdb.Collection{FilePath: "test_collection_find.db", DType: reflect.TypeOf(A{})}
+	db.Insert(A{Name: "a", Age: 1})
+	db.Insert(A{Name: "b", Age: 2})
+	db.Insert(A{Name: "b", Age: 3})
+	db.Insert(A{Name: "c", Age: 4})
+	db.Insert(A{Name: "d", Age: 4})
+	db.Insert(A{Name: "d", Age: 5})
+
+	searchFields := make(map[string]interface{})
+	searchFields["Age"] = 5
+
+	var result interface{}
+	db.First(searchFields, &result)
+	t.Log(result)
+	if result == nil {
+		t.Fatal("result is nil")
+	}
+	if result.(A).Age != 5 {
+		t.Fatal("wrong result")
+	}
+}
+
 func TestCollection_Update(t *testing.T) {
 	db := lightdb.Collection{FilePath: "test_collection_find.db", DType: reflect.TypeOf(A{})}
 	i, insertError := db.Insert(A{Name: "a", Age: 1})

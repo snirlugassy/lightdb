@@ -27,6 +27,7 @@ type CollectionInterface interface {
 	Commit() error
 	Pull() error
 	Find(query map[string]interface{}, results *[]interface{}) error
+	First(query map[string]interface{}, result *interface{}) error
 }
 
 func (collection *Collection) Insert(object interface{}) (int, error) {
@@ -105,6 +106,33 @@ func (collection *Collection) Find(query map[string]interface{}, results *[]inte
 		}
 		if matchFlag {
 			*results = append(*results, item)
+		}
+	}
+
+	return nil
+}
+
+// Find the first item that matches the query
+func (collection *Collection) First(query map[string]interface{}, result *interface{}) error {
+	validField := make(map[string]interface{})
+
+	for k, v := range query {
+		if field, exists := collection.DType.FieldByName(k); exists && field.Type == reflect.TypeOf(v) {
+			validField[k] = v
+		}
+	}
+
+	for _, item := range collection.Index {
+		matchFlag := true
+		for k, v := range validField {
+			if reflect.ValueOf(item).FieldByName(k).Interface() != v {
+				matchFlag = false
+				break
+			}
+		}
+		if matchFlag {
+			*result = item
+			return nil
 		}
 	}
 
