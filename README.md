@@ -1,6 +1,8 @@
 # LightDB
 Lightweight object database written in Go
 
+For more information join our [Google Group](https://groups.google.com/g/lightdb)
+
 ### Initialize DB instance
 ```go
 db := lightdb.Database{
