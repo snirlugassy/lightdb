@@ -7,7 +7,7 @@
 
 Lightweight object database written in Go
 
-For more information, feel free to join our [Discussions](https://github.com/snirlugassy/lightdb/discussions)
+For more information, feel free to join our [discussions](https://github.com/snirlugassy/lightdb/discussions) or to checkout our [development board](https://github.com/snirlugassy/lightdb/projects/1)
 
 ### Installation
 `go get github.com/snirlugassy/lightdb`
