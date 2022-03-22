@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 	"errors"
 	"reflect"
+	"sync"
 )
 
 type CollectionCore struct {
@@ -16,6 +17,7 @@ type Collection struct {
 	Name     string
 	FilePath string
 	DType    reflect.Type
+	mutex    sync.Mutex
 }
 
 type CollectionInterface interface {
@@ -31,6 +33,7 @@ type CollectionInterface interface {
 }
 
 func (collection *Collection) Insert(object interface{}) (int, error) {
+	collection.mutex.Lock()
 	if collection.Index == nil {
 		collection.Index = make(map[int]interface{})
 	} else if reflect.TypeOf(object) != collection.DType {
@@ -38,10 +41,12 @@ func (collection *Collection) Insert(object interface{}) (int, error) {
 	}
 	collection.Seq++
 	collection.Index[collection.Seq] = object
+	collection.mutex.Unlock()
 	return collection.Seq, nil
 }
 
 func (collection *Collection) InsertArray(objects []interface{}) ([]int, error) {
+	collection.mutex.Lock()
 	ids := make([]int, 0)
 	for i := 0; i < len(objects); i++ {
 		id, err := collection.Insert(objects[i])
@@ -50,6 +55,7 @@ func (collection *Collection) InsertArray(objects []interface{}) ([]int, error) 
 		}
 		ids = append(ids, id)
 	}
+	collection.mutex.Unlock()
 	return ids, nil
 }
 
@@ -58,32 +64,40 @@ func (collection *Collection) Get(id int) interface{} {
 }
 
 func (collection *Collection) Delete(id int) {
+	collection.mutex.Lock()
 	delete(collection.Index, id)
+	collection.mutex.Unlock()
 }
 
 func (collection *Collection) Update(id int, object interface{}) error {
+	collection.mutex.Lock()
 	if reflect.TypeOf(object) != collection.DType {
 		return errors.New("invalid type of object to update")
 	}
 	collection.Index[id] = object
+	collection.mutex.Unlock()
 	return nil
 }
 
 func (collection *Collection) Commit() error {
+	collection.mutex.Lock()
 	gob.Register(reflect.New(collection.DType).Elem().Interface())
 	err := writeObject(collection.FilePath+".core", collection.CollectionCore)
 	if err != nil {
 		return err
 	}
+	collection.mutex.Unlock()
 	return nil
 }
 
 func (collection *Collection) Pull() error {
+	collection.mutex.Lock()
 	gob.Register(reflect.New(collection.DType).Elem().Interface())
 	err := readObject(collection.FilePath+".core", &collection.CollectionCore)
 	if err != nil {
 		return err
 	}
+	collection.mutex.Unlock()
 	return nil
 }
 
