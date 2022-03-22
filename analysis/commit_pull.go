@@ -11,10 +11,10 @@ import (
 	"time"
 )
 
-func analyzeInsert(output_path string) {
+func analyzeCommitAndPull(output_path string) {
 	result_file, err := os.Create(output_path)
 	if err != nil {
-		log.Fatal("error creating at " + output_path)
+		log.Fatal("error creating file at " + output_path)
 	}
 
 	writer := csv.NewWriter(result_file)
@@ -40,11 +40,16 @@ func analyzeInsert(output_path string) {
 				XZ: 4,
 			})
 		}
+		// The "InsertArray" isn't included in this analysis
+		// only the commit and pull actions should be measured here
+		collection.InsertArray(dummy_data)
+
 		// START TIMER
 		start := time.Now()
 
 		// WORK
-		collection.InsertArray(dummy_data)
+		collection.Commit()
+		collection.Pull()
 
 		// STOP TIMER
 		duration := time.Since(start).Seconds()
