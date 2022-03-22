@@ -86,3 +86,12 @@ if err != nil {
 collection2.Pull()
 _user1, found := collection2.Get(1).(User)
 ```
+
+### Runtime analysis
+#### Insert
+
+![insert-line-chart](/analysis/insert_viz.png)
+
+#### Commit and Pull DB with single collection
+
+![commit-pull-line](/analysis/commit_pull_viz.png)
