@@ -3,8 +3,13 @@ Lightweight object database written in Go
 
 For more information join our [Google Group](https://groups.google.com/g/lightdb)
 
+### Installation
+`go get github.com/snirlugassy/lightdb`
+
 ### Initialize DB instance
 ```go
+import "github.com/snirlugassy/lightdb"
+
 db := lightdb.Database{
     Name: "example-db",
     Path: "/tmp/db",

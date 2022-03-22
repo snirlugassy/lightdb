@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/csv"
 	"fmt"
-	"lightdb"
+	"github.com/snirlugassy/lightdb"
 	"log"
 	"os"
 	"path"

@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"lightdb"
+	"github.com/snirlugassy/lightdb"
 	"reflect"
 	"testing"
 )

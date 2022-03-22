@@ -1,14 +1,12 @@
-name: Build and Test
+name: Publish
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    tags:        
+      - v1.*
 
 jobs:
-
-  build:
+  proxy-listing:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -23,3 +21,8 @@ jobs:
 
     - name: Test
       run: go test -v ./...
+      
+    - name: Publish
+      run: |
+        echo ${GITHUB_REF##*/}
+        GOPROXY=proxy.golang.org go list -m github.com/snirlugassy/lightdb@${GITHUB_REF##*/}
