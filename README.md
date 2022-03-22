@@ -1,4 +1,11 @@
+
 # LightDB
+
+[![build-and-test-badge](https://img.shields.io/github/workflow/status/snirlugassy/lightdb/Build%20and%20Test/main)](https://github.com/snirlugassy/lightdb/actions/workflows/build.yml?branch=main)
+![license-badge](https://img.shields.io/github/license/snirlugassy/lightdb)
+![last-commit-badge](https://img.shields.io/github/last-commit/snirlugassy/lightdb)
+[![group-badge](https://img.shields.io/badge/-Group-yellow)](https://groups.google.com/g/lightdb)
+
 Lightweight object database written in Go
 
 For more information join our [Google Group](https://groups.google.com/g/lightdb)
