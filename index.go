@@ -1,28 +1,42 @@
 package lightdb
 
 import (
-	"log"
+	"errors"
 	"reflect"
 )
 
+type DBIndex struct {
+	_index map[interface{}][]int
+	field  string
+}
+
 type HashIndex struct {
-	Index      map[interface{}][]int
-	Collection *Collection
-	field      string
+	DBIndex
 }
 
-func (index *HashIndex) Build(field string) {
-	_, found := index.Collection.DType.FieldByName(field)
+func (index *HashIndex) Build(collection *Collection, field string) error {
+	_, found := collection.DType.FieldByName(field)
 	if !found {
-		log.Fatal("field " + field + " does not exists")
-	} else {
-		log.Println("field found!")
+		return errors.New("field " + field + " does not exists")
 	}
 
-	index.Index = make(map[interface{}][]int)
+	index._index = make(map[interface{}][]int)
 
-	for id, obj := range index.Collection.Index {
+	for id, obj := range collection.Index {
 		fieldValue := reflect.ValueOf(obj).FieldByName(field).Interface()
-		index.Index[fieldValue] = append(index.Index[fieldValue], id)
+		index._index[fieldValue] = append(index._index[fieldValue], id)
 	}
+
+	return nil
 }
+
+func (index *HashIndex) Get(v interface{}) []int {
+	return index._index[v]
+}
+
+type BTreeIndex struct {
+	DBIndex
+}
+
+func (index *BTreeIndex) Build(collection *Collection, field string) error { return nil }
+func (index *BTreeIndex) Get(v interface{}) []int                          { return nil }
