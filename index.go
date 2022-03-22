@@ -19,17 +19,10 @@ func (index *HashIndex) Build(field string) {
 		log.Println("field found!")
 	}
 
+	index.Index = make(map[interface{}][]int)
+
 	for id, obj := range index.Collection.Index {
 		fieldValue := reflect.ValueOf(obj).FieldByName(field).Interface()
 		index.Index[fieldValue] = append(index.Index[fieldValue], id)
 	}
 }
-
-//Collection
-//	1 -> p1
-//	2 -> p2
-//	3 -> p3
-
-//Index
-//	x -> i1, i2
-//	y -> i3, i4
