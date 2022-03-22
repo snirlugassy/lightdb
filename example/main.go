@@ -1,7 +1,7 @@
 package main
 
 import (
-	"lightdb"
+	"github.com/snirlugassy/lightdb"
 	"log"
 	"reflect"
 )
