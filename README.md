@@ -90,8 +90,8 @@ _user1, found := collection2.Get(1).(User)
 ### Runtime analysis
 #### Insert
 
-![insert-line-chart](/analysis/insert_viz.png)
+![insert-line-chart](https://raw.githubusercontent.com/snirlugassy/lightdb/main/analysis/insert_viz.png)
 
 #### Commit and Pull DB with single collection
 
-![commit-pull-line](/analysis/commit_pull_viz.png)
+![commit-pull-line](https://raw.githubusercontent.com/snirlugassy/lightdb/main/analysis/commit_pull_viz.png)
