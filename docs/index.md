@@ -1,8 +1,22 @@
+
 # LightDB
+
+[![build-and-test-badge](https://img.shields.io/github/workflow/status/snirlugassy/lightdb/Build%20and%20Test/main)](https://github.com/snirlugassy/lightdb/actions/workflows/build.yml?branch=main)
+![license-badge](https://img.shields.io/github/license/snirlugassy/lightdb)
+![last-commit-badge](https://img.shields.io/github/last-commit/snirlugassy/lightdb)
+[![group-badge](https://img.shields.io/badge/-Group-yellow)](https://groups.google.com/g/lightdb)
+
 Lightweight object database written in Go
+
+For more information join our [Google Group](https://groups.google.com/g/lightdb)
+
+### Installation
+`go get github.com/snirlugassy/lightdb`
 
 ### Initialize DB instance
 ```go
+import "github.com/snirlugassy/lightdb"
+
 db := lightdb.Database{
     Name: "example-db",
     Path: "/tmp/db",
@@ -72,3 +86,12 @@ if err != nil {
 collection2.Pull()
 _user1, found := collection2.Get(1).(User)
 ```
+
+### Runtime analysis
+#### Insert
+
+![insert-line-chart](/analysis/insert_viz.png)
+
+#### Commit and Pull DB with single collection
+
+![commit-pull-line](/analysis/commit_pull_viz.png)
