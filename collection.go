@@ -112,7 +112,6 @@ func (collection *Collection) Find(query map[string]interface{}, results *[]inte
 	return nil
 }
 
-// Find the first item that matches the query
 func (collection *Collection) First(query map[string]interface{}, result *interface{}) error {
 	validField := make(map[string]interface{})
 
