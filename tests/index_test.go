@@ -17,5 +17,5 @@ func TestHashIndex(t *testing.T) {
 
 	index := lightdb.HashIndex{Collection: &collection}
 	index.Build("Name")
-	t.Log(index.Index["b"])
+	t.Log(index.Index["d"])
 }
