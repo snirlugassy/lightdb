@@ -146,10 +146,11 @@ func TestCollection_First(t *testing.T) {
 
 	var result interface{}
 	collection.First(searchFields, &result)
-	t.Log(result)
+
 	if result == nil {
 		t.Fatal("result is nil")
 	}
+
 	if result.(A).Age != 5 {
 		t.Fatal("wrong result")
 	}
@@ -170,7 +171,7 @@ func TestCollection_Update(t *testing.T) {
 }
 
 func TestCollection_Filter(t *testing.T) {
-	collectionPath := filepath.Join(os.TempDir(), "test_find.collection")
+	collectionPath := filepath.Join(os.TempDir(), "test_filter.collection")
 	collection := lightdb.Collection{FilePath: collectionPath, DType: reflect.TypeOf(A{})}
 	collection.Insert(A{Name: "a", Age: 1})
 	collection.Insert(A{Name: "b", Age: 2})
@@ -181,10 +182,31 @@ func TestCollection_Filter(t *testing.T) {
 
 	results := make([]interface{}, 0)
 	filter := func(a interface{}) bool { return a.(A).Age > 3 }
+
 	collection.Filter(filter, &results)
-	t.Log(results)
 
 	if len(results) != 3 {
 		t.Fatal("wrong results array size")
+	}
+}
+
+func TestCollection_FilterFirst(t *testing.T) {
+	collectionPath := filepath.Join(os.TempDir(), "test_filter_first.collection")
+	collection := lightdb.Collection{FilePath: collectionPath, DType: reflect.TypeOf(A{})}
+	collection.Insert(A{Name: "a", Age: 1})
+	collection.Insert(A{Name: "b", Age: 2})
+	collection.Insert(A{Name: "b", Age: 3})
+
+	filter := func(a interface{}) bool { return a.(A).Age > 2 }
+
+	var result interface{}
+	collection.FilterFirst(filter, &result)
+
+	if result == nil {
+		t.Fatal("result is nil")
+	}
+
+	if result.(A).Age != 3 || result.(A).Name != "b" {
+		t.Fatal("wrong result")
 	}
 }
