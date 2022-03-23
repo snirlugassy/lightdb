@@ -20,17 +20,19 @@ type Collection struct {
 	mutex    sync.Mutex
 }
 
-type CollectionInterface interface {
-	Insert(object interface{}) (int, error)
-	InsertArray(objects []interface{}) ([]int, error)
-	Get(id int) interface{}
-	Delete(id int)
-	Update(id int, object interface{}) error
-	Commit() error
-	Pull() error
-	Find(query map[string]interface{}, results *[]interface{}) error
-	First(query map[string]interface{}, result *interface{}) error
-}
+//type CollectionInterface interface {
+//	Insert(object interface{}) (int, error)
+//	InsertArray(objects []interface{}) ([]int, error)
+//	Get(id int) interface{}
+//	Delete(id int)
+//	Update(id int, object interface{}) error
+//	Commit() error
+//	Pull() error
+//	Find(query map[string]interface{}, results *[]interface{})
+//	First(query map[string]interface{}, result *interface{}) error
+//	Filter(query map[string]interface{}, results *[]interface{})
+//	FilterFirst(query map[string]interface{}, result *interface{})
+//}
 
 func (collection *Collection) Insert(object interface{}) (int, error) {
 	collection.mutex.Lock()
@@ -101,7 +103,7 @@ func (collection *Collection) Pull() error {
 	return nil
 }
 
-func (collection *Collection) Find(query map[string]interface{}, results *[]interface{}) error {
+func (collection *Collection) Find(query map[string]interface{}, results *[]interface{}) {
 	validFields := make(map[string]interface{})
 
 	for k, v := range query {
@@ -122,11 +124,9 @@ func (collection *Collection) Find(query map[string]interface{}, results *[]inte
 			*results = append(*results, item)
 		}
 	}
-
-	return nil
 }
 
-func (collection *Collection) First(query map[string]interface{}, result *interface{}) error {
+func (collection *Collection) First(query map[string]interface{}, result *interface{}) {
 	validField := make(map[string]interface{})
 
 	for k, v := range query {
@@ -145,9 +145,24 @@ func (collection *Collection) First(query map[string]interface{}, result *interf
 		}
 		if matchFlag {
 			*result = item
-			return nil
+			break
 		}
 	}
+}
 
-	return nil
+func (collection *Collection) Filter(filter func(v interface{}) bool, results *[]interface{}) {
+	for _, item := range collection.Index {
+		if filter(item) {
+			*results = append(*results, item)
+		}
+	}
+}
+
+func (collection *Collection) FilterFirst(filter func(v interface{}) bool, result *interface{}) {
+	for _, item := range collection.Index {
+		if filter(item) {
+			*result = item
+			break
+		}
+	}
 }
