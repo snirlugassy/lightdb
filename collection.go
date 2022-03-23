@@ -151,3 +151,13 @@ func (collection *Collection) First(query map[string]interface{}, result *interf
 
 	return nil
 }
+
+func (collection *Collection) Filter(filter func(v interface{}) bool, results *[]interface{}) error {
+	for _, item := range collection.Index {
+		if filter(item) {
+			*results = append(*results, item)
+		}
+	}
+
+	return nil
+}

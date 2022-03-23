@@ -48,13 +48,34 @@ if !found {
 }
 ```
 
-### Search objects
+### Find objects by fields
 ```go
 personSearch := make(map[string]interface{})
 personSearch["Name"] = "David"
 
 results := make([]interface{}, 0)
 collection.Find(personSearch, &results)
+```
+
+### Filter objects using filtering function
+```go
+type Person struct {
+    Age  int
+    Name string
+}
+
+collection := lightdb.Collection{FilePath: collectionPath, DType: reflect.TypeOf(A{})}
+collection.Insert(Person{Name: "a", Age: 1})
+collection.Insert(Person{Name: "b", Age: 2})
+collection.Insert(Person{Name: "b", Age: 3})
+collection.Insert(Person{Name: "c", Age: 4})
+collection.Insert(Person{Name: "d", Age: 4})
+collection.Insert(Person{Name: "d", Age: 5})
+
+filter := func(a interface{}) bool { return a.(Person).Age > 3 }
+
+results := make([]interface{}, 0)
+collection.Filter(filter, &results)
 ```
 
 ### Update objects
