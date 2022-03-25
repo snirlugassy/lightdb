@@ -17,6 +17,21 @@ type B struct {
 	Title string
 }
 
+func TestCollection_GetAll(t *testing.T) {
+	collectionPath := filepath.Join(os.TempDir(), "test_get_all.collection")
+	collection := lightdb.Collection{FilePath: collectionPath, DType: reflect.TypeOf(A{})}
+	collection.Insert(A{Name: "a", Age: 1})
+	collection.Insert(A{Name: "b", Age: 2})
+	collection.Insert(A{Name: "b", Age: 3})
+	collection.Insert(A{Name: "c", Age: 4})
+
+	items := collection.GetAll()
+
+	if len(items) != 4 {
+		t.Fatal("wrong result size for all items")
+	}
+}
+
 func TestCollection_Insert(t *testing.T) {
 	collectionPath := filepath.Join(os.TempDir(), "test_insert.collection")
 	collection := lightdb.Collection{FilePath: collectionPath, DType: reflect.TypeOf(A{})}

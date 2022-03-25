@@ -3,6 +3,7 @@ package lightdb
 import (
 	"encoding/gob"
 	"errors"
+	"os"
 	"reflect"
 	"sync"
 )
@@ -20,22 +21,13 @@ type Collection struct {
 	mutex    sync.Mutex
 }
 
-//type CollectionInterface interface {
-//	Insert(object interface{}) (int, error)
-//	InsertArray(objects []interface{}) ([]int, error)
-//	Get(id int) interface{}
-//	Delete(id int)
-//	Update(id int, object interface{}) error
-//	Commit() error
-//	Pull() error
-//	Find(query map[string]interface{}, results *[]interface{})
-//	First(query map[string]interface{}, result *interface{}) error
-//	Filter(query map[string]interface{}, results *[]interface{})
-//	FilterFirst(query map[string]interface{}, result *interface{})
-//}
+func (collection *Collection) getCorePath() string {
+	return collection.FilePath + ".core"
+}
 
 func (collection *Collection) Insert(object interface{}) (int, error) {
 	collection.mutex.Lock()
+	defer collection.mutex.Unlock()
 	if collection.Index == nil {
 		collection.Index = make(map[int]interface{})
 	} else if reflect.TypeOf(object) != collection.DType {
@@ -43,12 +35,12 @@ func (collection *Collection) Insert(object interface{}) (int, error) {
 	}
 	collection.Seq++
 	collection.Index[collection.Seq] = object
-	collection.mutex.Unlock()
 	return collection.Seq, nil
 }
 
 func (collection *Collection) InsertArray(objects []interface{}) ([]int, error) {
 	collection.mutex.Lock()
+	defer collection.mutex.Unlock()
 	ids := make([]int, 0)
 	for i := 0; i < len(objects); i++ {
 		id, err := collection.Insert(objects[i])
@@ -57,7 +49,6 @@ func (collection *Collection) InsertArray(objects []interface{}) ([]int, error) 
 		}
 		ids = append(ids, id)
 	}
-	collection.mutex.Unlock()
 	return ids, nil
 }
 
@@ -65,41 +56,53 @@ func (collection *Collection) Get(id int) interface{} {
 	return collection.CollectionCore.Index[id]
 }
 
+func (collection *Collection) GetAll() []interface{} {
+	items := make([]interface{}, 0)
+	for _, x := range collection.Index {
+		items = append(items, x)
+	}
+	return items
+}
+
 func (collection *Collection) Delete(id int) {
 	collection.mutex.Lock()
+	defer collection.mutex.Unlock()
 	delete(collection.Index, id)
-	collection.mutex.Unlock()
 }
 
 func (collection *Collection) Update(id int, object interface{}) error {
 	collection.mutex.Lock()
+	defer collection.mutex.Unlock()
 	if reflect.TypeOf(object) != collection.DType {
 		return errors.New("invalid type of object to update")
 	}
 	collection.Index[id] = object
-	collection.mutex.Unlock()
 	return nil
 }
 
 func (collection *Collection) Commit() error {
 	collection.mutex.Lock()
+	defer collection.mutex.Unlock()
 	gob.Register(reflect.New(collection.DType).Elem().Interface())
-	err := writeObject(collection.FilePath+".core", collection.CollectionCore)
+	err := writeObject(collection.getCorePath(), collection.CollectionCore)
 	if err != nil {
 		return err
 	}
-	collection.mutex.Unlock()
 	return nil
 }
 
 func (collection *Collection) Pull() error {
+	if _, err := os.Stat(collection.getCorePath()); os.IsNotExist(err) {
+		return nil
+	}
+
 	collection.mutex.Lock()
+	defer collection.mutex.Unlock()
 	gob.Register(reflect.New(collection.DType).Elem().Interface())
 	err := readObject(collection.FilePath+".core", &collection.CollectionCore)
 	if err != nil {
 		return err
 	}
-	collection.mutex.Unlock()
 	return nil
 }
 
