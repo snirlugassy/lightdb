@@ -2,7 +2,6 @@ package lightdb
 
 import (
 	"encoding/gob"
-	"encoding/json"
 	"os"
 )
 
@@ -40,32 +39,32 @@ func readObject(filePath string, object interface{}) error {
 	return nil
 }
 
-func writeJSON(filePath string, object interface{}) error {
-	data, encodingError := json.Marshal(object)
-	if encodingError != nil {
-		return encodingError
-	}
+// func writeJSON(filePath string, object interface{}) error {
+// 	data, encodingError := json.Marshal(object)
+// 	if encodingError != nil {
+// 		return encodingError
+// 	}
 
-	file, writeFileError := os.Create(filePath)
-	if writeFileError != nil {
-		return writeFileError
-	}
+// 	file, writeFileError := os.Create(filePath)
+// 	if writeFileError != nil {
+// 		return writeFileError
+// 	}
 
-	file.Write(data)
-	file.Close()
-	return nil
-}
+// 	file.Write(data)
+// 	file.Close()
+// 	return nil
+// }
 
-func readJSON(filePath string, target interface{}) error {
-	data, err := os.ReadFile(filePath)
-	if err != nil {
-		return err
-	}
+// func readJSON(filePath string, target interface{}) error {
+// 	data, err := os.ReadFile(filePath)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	err = json.Unmarshal(data, target)
-	if err != nil {
-		return err
-	}
+// 	err = json.Unmarshal(data, target)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	return nil
-}
+// 	return nil
+// }

@@ -2,6 +2,7 @@ package lightdb
 
 import (
 	"encoding/gob"
+	"encoding/json"
 	"errors"
 	"os"
 	"reflect"
@@ -168,4 +169,8 @@ func (collection *Collection) FilterFirst(filter func(v interface{}) bool, resul
 			break
 		}
 	}
+}
+
+func (collection *Collection) ToJSON() ([]byte, error) {
+	return json.Marshal(collection.GetAll())
 }

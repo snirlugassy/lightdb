@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/snirlugassy/lightdb"
 	"log"
 	"reflect"
+
+	"github.com/snirlugassy/lightdb"
 )
 
 type User struct {
@@ -18,7 +19,7 @@ func main() {
 		Path: "/tmp/db",
 	}
 
-	collection := db.CreateCollection("users", reflect.TypeOf(User{}))
+	collection := db.InitCollection("users", reflect.TypeOf(User{}))
 
 	john, err := collection.Insert(User{ID: 1, Name: "John"})
 	if err != nil {

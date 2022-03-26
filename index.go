@@ -7,7 +7,6 @@ import (
 
 type DBIndex struct {
 	_index map[interface{}][]int
-	field  string
 }
 
 type HashIndex struct {

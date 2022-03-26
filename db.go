@@ -2,6 +2,7 @@ package lightdb
 
 import (
 	"errors"
+	"log"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -14,25 +15,32 @@ type Database struct {
 }
 
 func (db *Database) Init() error {
+	log.Println(db.Path)
 	db.Collections = make([]*Collection, 0)
-	dbPath, err := os.Open(db.Path)
+	_, err := os.Open(db.Path)
+
+	if os.IsNotExist(err) {
+		// If the path doesn't exists, try to mkdir
+		mkdirError := os.Mkdir(db.Path, 0666)
+		if mkdirError != nil {
+			return mkdirError
+		}
+	}
+
+	pathStat, err := os.Stat(db.Path)
 	if err != nil {
 		return err
 	}
 
-	pathInfo, err := dbPath.Stat()
-	if err != nil {
-		return err
-	}
-
-	if !pathInfo.IsDir() {
-		errors.New("db path is not a directory")
+	if os.IsExist(err) && !pathStat.IsDir() {
+		// If the path exists but isn't a dir -> raise error
+		return errors.New("db path exists but not a folder")
 	}
 
 	return nil
 }
 
-func (db *Database) CreateCollection(name string, dtype reflect.Type) *Collection {
+func (db *Database) InitCollection(name string, dtype reflect.Type) *Collection {
 	collection := Collection{
 		Name:     name,
 		DType:    dtype,
@@ -43,14 +51,10 @@ func (db *Database) CreateCollection(name string, dtype reflect.Type) *Collectio
 }
 
 func (db *Database) LoadCollection(name string, dtype reflect.Type) (*Collection, error) {
-	collection := Collection{
-		Name:     name,
-		DType:    dtype,
-		FilePath: filepath.Join(db.Path, name+".db"),
-	}
+	collection := db.InitCollection(name, dtype)
 	pullError := collection.Pull()
-	db.Collections = append(db.Collections, &collection)
-	return &collection, pullError
+	db.Collections = append(db.Collections, collection)
+	return collection, pullError
 }
 
 func (db *Database) GetCollection(name string) (*Collection, bool) {

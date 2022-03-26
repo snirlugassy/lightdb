@@ -14,17 +14,25 @@ For more information, feel free to join our [discussions](https://github.com/sni
 
 ### Initialize DB instance
 ```go
-import "github.com/snirlugassy/lightdb"
+import (
+    "log"
+    "github.com/snirlugassy/lightdb"
+)
 
 db := lightdb.Database{
-    Name: "example-db",
-    Path: "/tmp/db",
+    Name: "example-db",     // Name the DB
+    Path: "/tmp/db",        // Path to DB directory
+}
+
+err := db.Init()
+if err != nil {
+    log.Fatal(err)
 }
 ```
 
 ### Create collection
 ```go
-collection := db.CreateCollection("users", reflect.TypeOf(User{}))
+collection := db.InitCollection("users", reflect.TypeOf(User{}))
 ```
 
 ### Insert objects
