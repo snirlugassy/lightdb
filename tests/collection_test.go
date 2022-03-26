@@ -1,11 +1,12 @@
 package tests
 
 import (
-	"github.com/snirlugassy/lightdb"
 	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
+
+	"github.com/snirlugassy/lightdb"
 )
 
 type A struct {
@@ -15,6 +16,30 @@ type A struct {
 
 type B struct {
 	Title string
+}
+
+func TestCollection_Get(t *testing.T) {
+	collectionPath := filepath.Join(os.TempDir(), "test_get.collection")
+	collection := lightdb.Collection{FilePath: collectionPath, DType: reflect.TypeOf(A{})}
+	objID, err := collection.Insert(A{Name: "a", Age: 1})
+	if err != nil {
+		t.Fatal("failed to insert object")
+	}
+
+	obj, found := collection.Get(objID).(A)
+	if !found {
+		t.Fatal("inserted object not found")
+	}
+
+	if obj.Name != "a" || obj.Age != 1 {
+		t.Fatal("returned object not matching inserted object")
+	}
+
+	obj, found = collection.Get(999).(A)
+	if found {
+		t.Fatal("not inserted object found")
+	}
+
 }
 
 func TestCollection_GetAll(t *testing.T) {
@@ -223,5 +248,20 @@ func TestCollection_FilterFirst(t *testing.T) {
 
 	if result.(A).Age != 3 || result.(A).Name != "b" {
 		t.Fatal("wrong result")
+	}
+}
+
+func TestCollection_ToJSON(t *testing.T) {
+	collectionPath := filepath.Join(os.TempDir(), "test_to_json.collection")
+	collection := lightdb.Collection{FilePath: collectionPath, DType: reflect.TypeOf(A{})}
+	collection.Insert(A{Name: "a", Age: 1})
+
+	data, err := collection.ToJSON()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(string(data)) == 0 {
+		t.Fatal("empty json returned")
 	}
 }

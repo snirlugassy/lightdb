@@ -1,11 +1,11 @@
 package tests
 
 import (
-	"github.com/snirlugassy/lightdb"
 	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
+	"github.com/snirlugassy/lightdb"
 )
 
 func TestHashIndex(t *testing.T) {

@@ -24,7 +24,7 @@ db := lightdb.Database{
 
 ### Create collection
 ```go
-collection := db.CreateCollection("users", reflect.TypeOf(User{}))
+collection := db.InitCollection("users", reflect.TypeOf(User{}))
 ```
 
 ### Insert objects
