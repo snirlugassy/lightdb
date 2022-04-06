@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"reflect"
 
@@ -79,4 +80,16 @@ func main() {
 	results := make([]interface{}, 0)
 	collection.Find(personSearch, &results)
 	log.Println(results)
+
+	mydir := collection.DirName()
+	fmt.Println(mydir)
+
+	myFolder, err := collection.CalculateFolderSize()
+	log.Println(myFolder, err)
+
+	myInfo := collection.Info()
+	log.Println(myInfo)
+
+	myDbInfo := db.Info()
+	log.Println(myDbInfo)
 }

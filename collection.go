@@ -4,8 +4,10 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"os"
 	"reflect"
+	"regexp"
 	"sync"
 )
 
@@ -173,4 +175,46 @@ func (collection *Collection) FilterFirst(filter func(v interface{}) bool, resul
 
 func (collection *Collection) ToJSON() ([]byte, error) {
 	return json.Marshal(collection.GetAll())
+}
+
+func (collection *Collection) DirName() string {
+	path, _ := os.Getwd()
+	pathSlice := regexp.MustCompile("[^0-9A-Za-z_]").Split(path, -1)
+	currentDir := pathSlice[len(pathSlice)-1]
+	return currentDir
+
+}
+
+func (collection *Collection) CalculateFolderSize() (dirsize int64, err error) {
+
+	err = os.Chdir(".")
+	if err != nil {
+		return
+	}
+	files, err := ioutil.ReadDir(".")
+	if err != nil {
+		return
+	}
+
+	for _, file := range files {
+		if file.Mode().IsRegular() {
+			dirsize += file.Size()
+		}
+	}
+	return
+
+}
+
+func (collection *Collection) Info() (info map[string]interface{}) {
+	folder := collection.DirName()
+
+	fileSize, _ := collection.CalculateFolderSize()
+
+	info = make(map[string]interface{})
+
+	info["Folder"] = folder
+	info["File Size(bytes)"] = fileSize
+	info["collection name"] = collection.Name
+	return
+
 }
