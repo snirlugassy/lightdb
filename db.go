@@ -2,10 +2,12 @@ package lightdb
 
 import (
 	"errors"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"reflect"
+	"regexp"
 )
 
 type Database struct {
@@ -84,4 +86,46 @@ func (db *Database) Pull() error {
 		}
 	}
 	return nil
+}
+
+func (db *Database) DirName() string {
+	path, _ := os.Getwd()
+	pathSlice := regexp.MustCompile("[^0-9A-Za-z_]").Split(path, -1)
+	currentDir := pathSlice[len(pathSlice)-1]
+	return currentDir
+
+}
+
+func (db *Database) CalculateFolderSize() (dirsize int64, err error) {
+
+	err = os.Chdir(".")
+	if err != nil {
+		return
+	}
+	files, err := ioutil.ReadDir(".")
+	if err != nil {
+		return
+	}
+
+	for _, file := range files {
+		if file.Mode().IsRegular() {
+			dirsize += file.Size()
+		}
+	}
+	return
+
+}
+
+func (db *Database) Info() (info map[string]interface{}) {
+	folder := db.DirName()
+
+	fileSize, _ := db.CalculateFolderSize()
+
+	info = make(map[string]interface{})
+
+	info["Folder"] = folder
+	info["File Size(bytes)"] = fileSize
+	info["Database name"] = db.Name
+	return
+
 }
